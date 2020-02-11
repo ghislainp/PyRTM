@@ -2,37 +2,49 @@ Python Radiative Transfer Modelling Wrappers
 ============================================
 
 Get spectral or integrated broadband irradiance outputs from SMARTS and SBdart
-conveniently, in python.
+conveniently, in Python 3.
 
 
 Prerequisites
 -------------
 
- * Python 2.6 or 2.7.
- * SBdart 2.4 and SMARTS 2.9.5 must be compiled and installed on your system
+ * Python 3.6.
+ * SBdart and SMARTS 2.9.5 must be compiled and installed on your system
    `$PATH` as `sbdart` and `smarts295` respectively.
- * Numpy is required. Installing PyLab is recommended, and will include numpy.
+ * Numpy and Pandas are required.
 
 
 Installation
 ------------
 
-The package is on PyPi, so assuming your python installation included
-`setuptools`, you can simply use `pip` (or `easy_install`).
+    $ pip install git+https://github.com/ghislainp/PyRTM
 
-    $ pip install rtm
+Be careful, the package on PyPi is old and only support Python 2. Don't use "pip install rtm".
 
-or with `easy_install`
+Tutorial
+--------
 
-    $ easy_install rtm
+To run SBdart or SMARTS, create a model object with a default settings, adjust the setting and call the spectrum or irradiance methods to obtain a Pandas DataFrame with the simultion results:
 
+```python
+import rtm
+
+model = rtm.SMARTS(rtm.settings.pollution['moderate'])
+
+model['time'] = datetime.datetime(2020, 2, 11, 12, 0)
+model['latitude'] = 45
+model['longitude'] = 3
+
+spec = model.spectrum()
+
+```
 
 Documentation
 -------------
 
 Check the Appropedia page: http://www.appropedia.org/PyRTM
 
-There are also more detailed setup and installation instructions on the
-Appropidia page.
+Acknowledgment
+---------------
 
-
+The initial repository (Python 2 version) is: https://github.com/Queens-Applied-Sustainability/PyRTM
