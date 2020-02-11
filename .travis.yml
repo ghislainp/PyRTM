@@ -4,13 +4,25 @@ python:
   - 3.6
   - 3.7
   - 3.8
+
 before_install:
+  - REPOPATH=`pwd`
+  - sudo apt-get update
+  - sudo apt-get -y install gfortran 
+  - sudo apt-get -y install binutils
+  - sudo apt-get -y install git
+  - sudo ln -s /usr/bin/gfortran /usr/local/bin/gfortran  # needed by SBDART
+  - cd $REPOPATH/bin/smarts && make
+  - cd $REPOPATH/bin/sbdart && git clone https://github.com/paulricchiazzi/SBDART && cd SBDART && make
+  - export PATH="$PATH:$REPOPATH/bin/smarts:$REPOPATH/bin/sbdart/SBDART"
+
   - python --version
   - pip install -U pip
   - pip install -U pytest
+  - cd $REPOPATH
+
 install:
   - pip install -r requirements.txt # install package
   - pip install .
+
 script: pytest # run tests
-#after_success:
-#  - codecov # submit coverage
