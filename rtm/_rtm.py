@@ -26,10 +26,8 @@ import re
 import shutil
 import subprocess
 import tempfile
-import superhash
-import cPickle as pickle
-from superhash import superhash
-import settings
+import pickle
+from rtm import settings
 
 
 class RTMError(Exception): pass
@@ -65,9 +63,9 @@ class Model(dict):
     def __init__(self, userconfig=None, target='.', cleanup=True,
                                                             *args, **kwargs):
         required = ['description', 'latitude', 'longitude', 'time']
-        config = dict(
-            {k: v for k, v in settings.defaults.items() if k in required})
+        config = {k: v for k, v in settings.defaults.items() if k in required}
         config.update(userconfig or {})
+
         self.target = target
         self.cleanup = cleanup
         super(Model, self).__init__(config, *args, **kwargs)
@@ -78,6 +76,7 @@ class Model(dict):
 
 class Working(object):
     """work with the executables"""
+
     def __init__(self, model):
         
         # set up the directory variables
@@ -86,7 +85,13 @@ class Working(object):
             getattr(model['time'], v) for v in SECONDARY)
         rundir = _vars_to_file([str(hash(model))])
 
-        path = os.path.join(model.target, primary, secondary, rundir)
+        self.cleanup = model.cleanup
+        self.cache = ~model.cleanup
+
+        if self.cleanup:
+            path = os.path.join(model.target, "-".join([primary, secondary, rundir]))
+        else:
+            path = os.path.join(model.target, primary, secondary, rundir)
 
         try:
             state = model._working_state[hash(model)]
@@ -115,10 +120,17 @@ class Working(object):
     
     def __exit__(self, type, value, traceback):
         """save state back to model"""
-        try:
-            self.model._workings_state[hash(self.model)].update(self.state)
-        except KeyError:
-            self.model._workings_state[hash(self.model)] = self.state
+
+        if self.cleanup:
+            for f in os.listdir(self.path):
+                if f[0] != ".":
+                    os.unlink(os.path.join(self.path, f))
+            os.rmdir(self.path)
+
+        # try:
+        #     self.model._workings_state[hash(self.model)].update(self.state)
+        # except KeyError:
+        #     self.model._workings_state[hash(self.model)] = self.state
     
     def __str__(self):
         return "<Working: %s>" % self.path
@@ -158,19 +170,20 @@ class Working(object):
         except KeyError:
             self.state['outfile'] = {}
 
-        # no local cache, check for a pickle
-        safe_cmd = _vars_to_file([cmd])
-        errfile = errfile or 'err-%s' % outfile
-        picklename = 'run %s.pickle' % safe_cmd
-        picklepath = os.path.join(self.path, picklename)
+        if self.cache:
+            # no local cache, check for a pickle
+            safe_cmd = _vars_to_file([cmd])
+            errfile = errfile or 'err-%s' % outfile
+            picklename = 'run %s.pickle' % safe_cmd
+            picklepath = os.path.join(self.path, picklename)
 
-        try:
-            with open(picklepath, 'rb') as pfile:
-                run_out = pickle.load(pfile)
-            self.state['outfile'][cmd] = run_out
-            return run_out
-        except IOError:
-            pass
+            try:
+                with open(picklepath, 'rb') as pfile:
+                    run_out = pickle.load(pfile)
+                self.state['outfile'][cmd] = run_out
+                return run_out
+            except IOError:
+                pass
        
         # no pickle, so now actually run the command
         cmd += ' 2> %s' % errfile
@@ -181,42 +194,13 @@ class Working(object):
         run_out = [p.returncode, err, self.model]
         self.state['outfile'][cmd] = run_out
 
-        with open(picklepath, 'wb') as cache_pickle:
-            pickle.dump(run_out, cache_pickle)
+        if self.cache:
+            with open(picklepath, 'wb') as cache_pickle:
+                pickle.dump(run_out, cache_pickle)
 
         return run_out
     
     def get(self, file_name, mode='r'):
         """all these files should be closed before finishing with Working"""
-        return open(os.path.join(self.path, file_name), mode)
-
-
-class CallableDict(dict):
-    """A lazy dictionary who will call its keys on access"""
-
-    def __init__(self, *args, **kwargs):
-        self._cache = {}
-        super(CallableDict, self).__init__(*args, **kwargs)
-
-    def __setitem__(self, key, value):
-        if not hasattr(value, '__call__'):
-            raise TypeError('value ' + str(value) + ' must be callable')
-        super(CallableDict, self).__setitem__(key, value)
-
-    def __getitem__(self, key):
-        try:
-            val = self._cache[key]
-        except KeyError:
-            val = dict.__getitem__(self, key)()
-            self._cache[key] = val
-        return val
-
-    def __delitem__(self, key):
-        super(CallableDict, self).__delitem__(key)
-        if key in self._cache:
-            del self._cache[key]
-
-    def update(self, d):
-        for k, v in d.items():
-            self.__setitem__(k, v)
+        return open(os.path.join(self.path, file_name), mode, encoding='latin_1')
 

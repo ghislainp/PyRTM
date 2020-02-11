@@ -23,9 +23,11 @@
 
 import os
 import numpy
+import pandas
+from contextlib import contextmanager
 
-import _rtm
-import settings
+from rtm import _rtm
+from rtm import settings
 
 resources = ['Albedo', 'CIE_data', 'Gases', 'Solar']
 resource_path = _rtm.get_data('smarts')
@@ -49,7 +51,7 @@ class SMARTS(_rtm.Model):
         with _rtm.Working(self) as working:
             return working.get(rawfile)
 
-
+    @contextmanager
     def run(self):
         """run smarts"""
 
@@ -77,50 +79,35 @@ class SMARTS(_rtm.Model):
                     else:
                         raise SMARTSError("%s: smarts no like\n%s" %
                             (working.path, line))
+            yield working
 
-    @property
     def spectrum(self):
         """get the global spectrum for the atmosphere"""
-        output='out.spectrum.txt'
-        self.run()
 
-        with _rtm.Working(self) as working:
+        with self.run() as working:
             try:
                 smout = working.get(output_file)
             except IOError:
                 raise SMARTSError("%s: didn't get output %s" %
                     (working.path, output_file))
-            try:
-                model_spectrum = numpy.genfromtxt(
-                    smout, skip_header=output_headers, dtype=[
-                        ('wavelength', numpy.float64),
-                        ('direct_normal', numpy.float64),
-                        ('diffuse', numpy.float64),
-                        ('global', numpy.float64),
-                        ('direct', numpy.float64),
-                        ])
-            except StopIteration:
-                raise SMARTSError("%s: Bad output file for genfromtxt "\
-                    "(%d header rows)" % (working.path, output_headers))
+        
+            model_spectrum = pandas.read_csv(smout, skiprows=1, delimiter=' ',
+                    names=['wavelength', 'direct_normal', 'diffuse', 'global', 'direct', ])
+
             model_spectrum['wavelength'] /= 1000
             model_spectrum['direct_normal'] *= 1000
             model_spectrum['diffuse'] *= 1000
             model_spectrum['direct'] *= 1000
             model_spectrum['global'] *= 1000
 
-        return model_spectrum
+        return model_spectrum.set_index('wavelength')
 
-    @property
     def irradiance(self):
         """Get the integrated irradiance across the spectrum"""
 
-        cols = ('direct_normal', 'diffuse', 'global', 'direct')
-        def get_irrad(col):
-            def irrad():
-                dat = self.spectrum
-                return numpy.trapz(dat[col],dat['wavelength'])
-            return irrad
-        return _rtm.CallableDict({k: get_irrad(k) for k in cols})
+        data = self.spectrum()
+        wrk = numpy.trapz(data, x=data.index, axis=0)
+        return pandas.DataFrame(wrk[None, :], columns=data.columns)
 
 
 def cardify(params):
@@ -329,7 +316,7 @@ def translate(params):
                 [addItem(d) for d in convert[param][0] if not d in processed]
                 translated.update(convert[param][1](val))
             else:
-                print "x %s" % param # ERROR!
+                print("x %s" % param)  # ERROR!
             
         processed.append(param)
     

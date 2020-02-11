@@ -36,7 +36,7 @@ setup(
     long_description=open('README.md').read(),
     packages=['rtm', 'rtm.tools'],
     include_package_data=True,
-    #install_requires=['numpy', 'FMM'],
+    install_requires=['numpy', 'pandas'],
     )
     
     

@@ -21,14 +21,15 @@
     along with PyRTM.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from collections import Iterable
-from itertools import repeat
-from functools import wraps
-import numpy
-    
+from collections.abc import Iterable
+from contextlib import contextmanager
 
-import _rtm
-import settings
+import numpy
+import pandas
+
+
+from rtm import _rtm
+from rtm import settings
 
 input_file = 'INPUT'
 command = 'sbdart'
@@ -49,6 +50,7 @@ class SBdart(_rtm.Model):
         with _rtm.Working(self) as working:
             return working.get(rawfile)
 
+    @contextmanager
     def run(self, output=default_out):
         """ run sbdart """
 
@@ -67,52 +69,30 @@ class SBdart(_rtm.Model):
             elif code != 0:
                 raise SBdartError("sbdart execution failed. Code %d, '\
                     'stderr:\n%s" % (status, err))
+            yield working
 
-    @property
     def spectrum(self):
         """ get the global spectrum for the atmosphere """
         output='out.spectrum.txt'
-        self.run(output=output)
 
-        with _rtm.Working(self) as working:
+        with self.run(output=output) as working:
             try:
                 sbout = working.get(output)
             except IOError:
-                raise SBdartError("didn't get output %s -- %s" %
-                    (output, err))
-            try:
-                model_spectrum = numpy.genfromtxt(
-                    sbout, skip_header=header_lines, dtype=[
-                        ('wavelength', numpy.float64),
-                        ('filter_function_value', numpy.float64),
-                        ('top_downward_flux', numpy.float64),
-                        ('top_upward_flux', numpy.float64),
-                        ('top_direct_downward_flux', numpy.float64),
-                        ('global', numpy.float64),
-                        ('upward', numpy.float64),
-                        ('direct', numpy.float64),
-                        ])
-            except StopIteration:
-                raise SBdartError("Bad output file for genfromtxt (%d header" \
-                                  " rows)" % (header_lines))
-        
-        return model_spectrum
+                raise SBdartError("didn't get output %s -- %s" % (output, err))
 
-    @property
+            model_spectrum = pandas.read_csv(sbout, skiprows=3, delimiter=' +',
+                names=['wavelength','filter_function_value','top_downward_flux','top_upward_flux','top_direct_downward_flux',
+                       'global','upward', 'direct'], engine='python')
+            
+        return model_spectrum.set_index('wavelength')
+
     def irradiance(self):
         """Get the integrated irradiance across the spectrum"""
 
-        cols = ('top_downward_flux','top_upward_flux',
-            'top_direct_downward_flux', 'global',
-            'upward', 'direct')
-
-        def get_irrad(col):
-            def irrad():
-                dat = self.spectrum
-                return numpy.trapz(dat[col],dat['wavelength'])
-            return irrad
-
-        return _rtm.CallableDict({k: get_irrad(k) for k in cols})
+        data = self.spectrum()
+        wrk = numpy.trapz(data, x=data.index, axis=0)
+        return pandas.DataFrame(wrk[None, :], columns=data.columns)
 
 
 def namelistify(config):
@@ -142,7 +122,7 @@ def translate(config):
     p.update(config)
     
     unsupported = ['description', 'solar_constant', 'season', 'formaldehyde',
-        'average_daily_temperature', 'nitrogen_trioxide', 'nitrous_acid']
+        'average_daily_temperature', 'nitrogen_trioxide', 'nitrous_acid', 'smarts_use_standard_atmos']
     
     hard_code = {
         'IAER': 5, # CHANGED TO 5: user set wlbaer, tbaer, wbaer, gbaer
@@ -244,7 +224,7 @@ def translate(config):
                 [addItem(d) for d in convert[param][0] if not d in processed]
                 translated.update(convert[param][1](val))
             else:
-                print "x %s" % param # Unrecognized!
+                print("x %s" % param) # Unrecognized!
             
         processed.append(param)
     

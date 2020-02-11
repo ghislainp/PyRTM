@@ -2,7 +2,7 @@ PROG =	smarts295
 
 OBJS =  smarts295.o
 
-FC = f90
+FC = gfortran
 FFLAGS = -O3
 LDFLAGS =
 

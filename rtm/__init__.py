@@ -22,8 +22,8 @@
 """
 
 
-import settings
-from sbdart import SBdart, SBdartError
-from smarts import SMARTS, SMARTSError, SunDownError
-from _rtm import RTMError
-from fmm import BadBoundsError
+from rtm import settings
+from rtm.sbdart import SBdart, SBdartError
+from rtm.smarts import SMARTS, SMARTSError, SunDownError
+from rtm._rtm import RTMError
+#from fmm import BadBoundsError
