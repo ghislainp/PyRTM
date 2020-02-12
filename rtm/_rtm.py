@@ -47,7 +47,7 @@ def get_data(path):
 
 def _vars_to_file(vars):
     """Return a safe string to be used as a file or directory name"""
-    clean_vars = [re.sub('[^a-zA-Z0-9_:\-]', '.', str(v)) for v in vars]
+    clean_vars = [re.sub('[^a-zA-Z0-9_:-]', '.', str(v)) for v in vars]
     clean_string = '-'.join(clean_vars)
     if clean_string.startswith('.'):
         clean_string = 'c' + clean_string
@@ -57,32 +57,29 @@ def _vars_to_file(vars):
     return clean_string
 
 
-class Model(dict):
+class Model():
     """The parent of what you probably need to use"""
 
-    def __init__(self, userconfig=None, target='.', cleanup=True,
-                                                            *args, **kwargs):
+    def __init__(self, userconfig=None, target='.', cleanup=True):
         required = ['description', 'latitude', 'longitude', 'time']
-        config = {k: v for k, v in settings.defaults.items() if k in required}
-        config.update(userconfig or {})
+        self.config = {k: v for k, v in settings.defaults.items() if k in required}
+        self.config.update(userconfig or {})
 
         self.target = target
         self.cleanup = cleanup
-        super(Model, self).__init__(config, *args, **kwargs)
 
     def __hash__(self):
-        return hash(dict.__str__(self) + str(self.__class__))
+        return hash(str(self.config) + str(self.__class__))
 
 
 class Working(object):
     """work with the executables"""
 
     def __init__(self, model):
-        
+
         # set up the directory variables
-        primary = _vars_to_file(model[v] for v in PRIMARY)
-        secondary = _vars_to_file(
-            getattr(model['time'], v) for v in SECONDARY)
+        primary = _vars_to_file(model.config[v] for v in PRIMARY)
+        secondary = _vars_to_file(getattr(model.config['time'], v) for v in SECONDARY)
         rundir = _vars_to_file([str(hash(model))])
 
         self.cleanup = model.cleanup
@@ -114,10 +111,10 @@ class Working(object):
         self.model = model
         self.path = path
         self.state = state
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, type, value, traceback):
         """save state back to model"""
 
@@ -131,23 +128,21 @@ class Working(object):
         #     self.model._workings_state[hash(self.model)].update(self.state)
         # except KeyError:
         #     self.model._workings_state[hash(self.model)] = self.state
-    
+
     def __str__(self):
         return "<Working: %s>" % self.path
-    
+
     def link(self, resources, path=""):
         """link some stuff in"""
         if type(resources) == str:
             resources = [resources]
         try:
-            [os.symlink(
-                os.path.join(path, resource),
-                os.path.join(self.path, resource)
-                ) for resource in resources]
+            for resource in resources:
+                os.symlink(os.path.join(path, resource), os.path.join(self.path, resource))
         except OSError as err:
             if err.errno is not 17:
                 raise
-    
+
     def write(self, file_name, content):
         if file_name in self.state.get('writes', []):
             return
@@ -161,7 +156,6 @@ class Working(object):
         else:
             self.state['writes'].append(file_name)
 
-    
     def run(self, cmd, outfile, errfile=None):
 
         try:
@@ -184,7 +178,7 @@ class Working(object):
                 return run_out
             except IOError:
                 pass
-       
+
         # no pickle, so now actually run the command
         cmd += ' 2> %s' % errfile
         p = subprocess.Popen(cmd, cwd=self.path, shell=True)
@@ -199,7 +193,7 @@ class Working(object):
                 pickle.dump(run_out, cache_pickle)
 
         return run_out
-    
+
     def get(self, file_name, mode='r'):
         """all these files should be closed before finishing with Working"""
         return open(os.path.join(self.path, file_name), mode, encoding='latin_1')

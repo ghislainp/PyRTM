@@ -24,60 +24,60 @@
 from dateutil.parser import parse as parsedt
 
 defaults = {
-    'description': 'Default Config', # use internally; any string
-    
-    'solar_constant': 1367, # W/m^2 in space
-    
-    'season': 'summer', # summer or winter
-    'time': parsedt('2012-10-11 12:00:00 -0500'), # specifying tz is important!
-    'latitude': 44, # degrees, north-positive
-    'longitude': 283.7, # degrees, east-positive
-    'elevation': 0, # metres above sea level
-    'surface_type': 'vegetation', # see docs for valid options
+    'description': 'Default Config',  # use internally; any string
+
+    'solar_constant': 1367,  # W/m^2 in space
+  
+    'season': 'summer',  # summer or winter
+    'time': parsedt('2012-10-11 12:00:00 -0500'),  # specifying tz is important!
+    'latitude': 44,  # degrees, north-positive
+    'longitude': 283.7,  # degrees, east-positive
+    'elevation': 0,  # metres above sea level
+    'surface_type': 'vegetation',  # see docs for valid options
     'single_scattering_albedo': 0.8,
 
-    'atmosphere': 'sub-arctic summer', # see docs for valid options
-    'average_daily_temperature': 15, # degrees C
-    'temperature': 15, # degrees C
-    'pressure': 1013.250, # mb
-    'relative_humidity': 35, # %
+    'atmosphere': 'sub-arctic summer',  # see docs for valid options
+    'average_daily_temperature': 15,  # degrees C
+    'temperature': 15,  # degrees C
+    'pressure': 1013.250,  # mb
+    'relative_humidity': 35,  # %
     'angstroms_coefficient': 0.08,
     'angstroms_exponent': 1.1977,
-    'aerosol_asymmetry': 0.6, 
-    'boundary_layer_ozone': 0.3, # atm-cm
+    'aerosol_asymmetry': 0.6,
+    'boundary_layer_ozone': 0.3,  # atm-cm
 
     # common gasses
-    'carbon_dioxide': 390, # ppm
-    'methane': 0.2, # ppm
-    'carbon_monoxide': 0, # ppm
-    'sulphur_dioxide': 0.01, #ppm
-    'nitric_oxide': 0.075, # ppm
-    'nitric_acid': 0.001, # ppm
-    'nitrogen_dioxide': 0.005, # ppm
-    'tropospheric_ozone': 0.0023, # atm-cm
+    'carbon_dioxide': 390,  # ppm
+    'methane': 0.2,  # ppm
+    'carbon_monoxide': 0,  # ppm
+    'sulphur_dioxide': 0.01,  # ppm
+    'nitric_oxide': 0.075,  # ppm
+    'nitric_acid': 0.001,  # ppm
+    'nitrogen_dioxide': 0.005,  # ppm
+    'tropospheric_ozone': 0.0023,  # atm-cm
 
     # SMARTS gasses
-    'formaldehyde': 0.001, # ppm
-    'nitrous_acid': 0.0005, # ppm
-    'nitrogen_trioxide': 1e-5, # ppm
+    'formaldehyde': 0.001,  # ppm
+    'nitrous_acid': 0.0005,  # ppm
+    'nitrogen_trioxide': 1e-5,  # ppm
 
     # SBdart gasses
-    'nitrogen': 781000, # ppm
-    'oxygen': 209000, # ppm
-    'nitrous_oxide': 0.32, # ppm
-    'ammonia': 5e-4, # ppm
+    'nitrogen': 781000,  # ppm
+    'oxygen': 209000,  # ppm
+    'nitrous_oxide': 0.32,  # ppm
+    'ammonia': 5e-4,  # ppm
 
-    'cloud_altitude': 2, # km bottom of cloud ... suggested by QIW
-    'cloud_thickness': 1, # km
-    'cloud_optical_depth': 0, # optical depth at 0.55 um
-    
+    'cloud_altitude': 2,  # km bottom of cloud ... suggested by QIW
+    'cloud_thickness': 1,  # km
+    'cloud_optical_depth': 0,  # optical depth at 0.55 um
+
     # SMARTS special
     'smarts_use_standard_atmos': True,
 
     # spectral settings
-    'lower_limit': 0.28, # um
-    'upper_limit': 2.5, # um
-    'resolution': 0.01, # um
+    'lower_limit': 0.28,  # um
+    'upper_limit': 2.5,  # um
+    'resolution': 0.01,  # um
 }
 
 
