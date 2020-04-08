@@ -60,17 +60,18 @@ def _vars_to_file(vars):
 class Model():
     """The parent of what you probably need to use"""
 
-    def __init__(self, userconfig=None, target='.', cleanup=True):
+    def __init__(self, userconfig=None, target='.', cleanup=True, **kwargs):
         required = ['description', 'latitude', 'longitude', 'time']
         self.config = {k: v for k, v in settings.defaults.items() if k in required}
-        self.config.update(userconfig or {})
+        if userconfig:
+            self.config.update(userconfig)
+        self.config.update(kwargs)
 
         self.target = target
         self.cleanup = cleanup
 
     def __hash__(self):
         return hash(str(self.config) + str(self.__class__))
-
 
 class Working(object):
     """work with the executables"""

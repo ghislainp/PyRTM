@@ -9,31 +9,35 @@ Prerequisites
 -------------
 
  * Python 3.6.
- * SBdart and SMARTS 2.9.5 must be compiled and installed on your system
-   `$PATH` as `sbdart` and `smarts295` respectively.
+ * If needed, SMARTS 2.9.5 must be compiled and installed on your system
+   `$PATH` as `smarts295`.
+ * SBDart is compiled during the setup using numpy.distutils, which requires a working fortran compiler.  
  * Numpy and Pandas are required.
 
 
 Installation
 ------------
 
-    $ pip install git+https://github.com/ghislainp/PyRTM
+    $ pip install atmosrt
 
-Be careful, the package on PyPi is old and only support Python 2. Don't use "pip install rtm".
+Or for the development version:
+    
+    $ pip install git+https://github.com/ghislainp/atmosrt
+
 
 Tutorial
 --------
 
-To run SBdart or SMARTS, create a model object with a default settings, adjust the setting and call the spectrum or irradiance methods to obtain a Pandas DataFrame with the simultion results:
+To run SBdart or SMARTS, create a model object with a default settings, adjust the config and call the spectrum or irradiance methods to obtain a Pandas DataFrame with the simulation results:
 
 ```python
-import rtm
+import atmosrt
+import datetime
 
-model = rtm.SMARTS(rtm.settings.pollution['moderate'])
-
-model['time'] = datetime.datetime(2020, 2, 11, 12, 0)
-model['latitude'] = 45
-model['longitude'] = 3
+model = atmosrt.SBdart(atmosrt.settings.pollution['moderate'],
+			time=datetime.datetime(2020, 2, 11, 12, 0),
+			latitude=45.0000,
+			longitude=3.0000)
 
 spec = model.spectrum()
 
@@ -42,9 +46,12 @@ spec = model.spectrum()
 Documentation
 -------------
 
-Check the Appropedia page: http://www.appropedia.org/PyRTM
+AtmosRT is a Python 3 version of PyRTM with only a few improvements.
+
+The PyRTM documentation is available from at http://www.appropedia.org/PyRTM
 
 Acknowledgment
 ---------------
 
-The initial repository (Python 2 version) is: https://github.com/Queens-Applied-Sustainability/PyRTM
+PyRTM is available from https://github.com/Queens-Applied-Sustainability/PyRTM
+
