@@ -1,0 +1,6 @@
+python module libsbdart ! in 
+    interface  ! in :sbdart
+        subroutine sbdart()
+        end subroutine sbdart
+    end interface 
+end python module libsbdart

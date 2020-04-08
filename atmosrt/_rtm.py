@@ -27,7 +27,7 @@ import shutil
 import subprocess
 import tempfile
 import pickle
-from rtm import settings
+from atmosrt import settings
 
 
 class RTMError(Exception): pass
@@ -103,7 +103,7 @@ class Working(object):
             try:
                 os.makedirs(path)
             except OSError as err:
-                if err.errno is not 17:
+                if err.errno != 17:
                     raise
 
             state['dir_created'] = True
@@ -140,7 +140,7 @@ class Working(object):
             for resource in resources:
                 os.symlink(os.path.join(path, resource), os.path.join(self.path, resource))
         except OSError as err:
-            if err.errno is not 17:
+            if err.errno != 17:
                 raise
 
     def write(self, file_name, content):

@@ -28,11 +28,13 @@ import numpy
 import pandas
 
 
-from rtm import _rtm
-from rtm import settings
+from atmosrt import _rtm
+from atmosrt import settings
+
+import libsbdart
 
 input_file = 'INPUT'
-command = 'sbdart'
+command = 'sbdart.py'
 header_lines = 3
 default_out = 'out.txt'
 
@@ -127,8 +129,10 @@ def translate(config):
                    'average_daily_temperature', 'nitrogen_trioxide', 'nitrous_acid',
                    'smarts_use_standard_atmos']
 
+    optional = ['aerosol_type']
+
     hard_code = {
-        'IAER': 5,  # CHANGED TO 5: user set wlbaer, tbaer, wbaer, gbaer
+        'IAER': p.get('aerosol_type', 5),
         'JAER': 1,  # background stratospheric....
         'WLBAER': 0.55,  # um
         'IOUT': 1,  # per-wavelength
@@ -139,9 +143,10 @@ def translate(config):
     direct = {
         'latitude': 'ALAT',
         'longitude': 'ALON',
+        'pressure': 'PBAR',
+
         'single_scattering_albedo': 'WBAER',
         'aerosol_asymmetry': 'GBAER',
-        'pressure': 'PBAR',
         'angstroms_coefficient': 'TBAER',  # optical depth at 0.55 um
         'angstroms_exponent': 'ABAER',
 
@@ -225,6 +230,8 @@ def translate(config):
                     if d not in processed:
                         addItem(d)
                 translated.update(convert[param][1](val))
+            elif param in optional:
+                pass
             else:
                 print("x %s" % param)  # Unrecognized!
 
