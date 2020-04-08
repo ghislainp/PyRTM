@@ -11,10 +11,8 @@ before_install:
   - sudo apt-get -y install gfortran 
   - sudo apt-get -y install binutils
   - sudo apt-get -y install git
-  - sudo ln -s /usr/bin/gfortran /usr/local/bin/gfortran  # needed by SBDART
   - cd $REPOPATH/bin/smarts && make
-  - cd $REPOPATH/bin/sbdart && git clone https://github.com/paulricchiazzi/SBDART && cd SBDART && make
-  - export PATH="$PATH:$REPOPATH/bin/smarts:$REPOPATH/bin/sbdart/SBDART"
+  - export PATH="$PATH:$REPOPATH/bin/smarts
 
   - python --version
   - pip install -U pip
