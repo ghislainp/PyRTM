@@ -12,8 +12,7 @@ before_install:
   - sudo apt-get -y install binutils
   - sudo apt-get -y install git
   - cd $REPOPATH/bin/smarts && make
-  - export PATH="$PATH:$REPOPATH/bin/smarts
-
+  - export PATH="$PATH:$REPOPATH/bin/smarts"
   - python --version
   - pip install -U pip
   - pip install -U pytest
