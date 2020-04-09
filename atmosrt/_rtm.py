@@ -186,6 +186,7 @@ class Working(object):
         p.wait()
         with open(os.path.join(self.path, errfile)) as errfile:
             err = errfile.read()
+
         run_out = [p.returncode, err, self.model]
         self.state['outfile'][cmd] = run_out
 

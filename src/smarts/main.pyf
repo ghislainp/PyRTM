@@ -1,0 +1,7 @@
+python module libsmarts_295 ! in 
+    interface  ! in :smarts_295
+        subroutine smarts_295()
+
+        end subroutine smarts_295
+    end interface 
+end python module libsmarts_295

@@ -28,7 +28,7 @@ import setuptools
 from numpy.distutils.core import setup, Extension
 
 
-lib = Extension(name='libsbdart',
+libsbdart = Extension(name='libsbdart',
                 sources=[
                     "src/sbdart/main.pyf",
                     "src/sbdart/params.f",
@@ -40,6 +40,13 @@ lib = Extension(name='libsbdart',
                     "src/sbdart/taucloud.f",
                     "src/sbdart/taugas.f",
                     "src/sbdart/drt-python.f",
+                ])
+
+
+libsmarts = Extension(name='libsmarts_295',
+                sources=[
+                    "src/smarts/main.pyf",
+                    "src/smarts/smarts295-python.f"
                 ])
 
 
@@ -58,9 +65,9 @@ setup(
     long_description='AtmosRT is an interface to two models (SBdart and Streams) written in Fortran.',
     long_description_content_type='text/markdown',
     url="https://github.com/ghislainp/atmosrt",
-    ext_modules=[lib],
-    scripts=['src/sbdart/sbdart.py'],
-    packages=['atmosrt', 'atmosrt.tools'],
+    ext_modules=[libsbdart, libsmarts],
+    scripts=['src/sbdart/sbdart.py', 'src/smarts/smarts.py'],
+    packages=['atmosrt'],
     include_package_data=True,
     install_requires=['numpy', 'pandas'],
 )
