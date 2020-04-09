@@ -31,15 +31,7 @@ from numpy.distutils.core import setup, Extension
 libsbdart = Extension(name='libsbdart',
                 sources=[
                     "src/sbdart/main.pyf",
-                    "src/sbdart/params.f",
-                    "src/sbdart/disort.f",
-                    "src/sbdart/disutil.f",
-                    "src/sbdart/spectra.f",
-                    "src/sbdart/tauaero.f",
-                    "src/sbdart/atms.f",
-                    "src/sbdart/taucloud.f",
-                    "src/sbdart/taugas.f",
-                    "src/sbdart/drt-python.f",
+                    "src/sbdart/all.f",
                 ])
 
 
@@ -52,7 +44,7 @@ libsmarts = Extension(name='libsmarts_295',
 
 setup(
     name='AtmosRT',
-    version='0.4',
+    version='0.5',
     author='Ghislain Picard',
     author_email='ghipicard@gmail.com',
     license='GPLv3',
