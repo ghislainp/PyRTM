@@ -6,17 +6,13 @@ python:
   - 3.8
 
 before_install:
-  - REPOPATH=`pwd`
   - sudo apt-get update
   - sudo apt-get -y install gfortran 
   - sudo apt-get -y install binutils
   - sudo apt-get -y install git
-  - cd $REPOPATH/bin/smarts && make
-  - export PATH="$PATH:$REPOPATH/bin/smarts"
   - python --version
   - pip install -U pip
   - pip install -U pytest
-  - cd $REPOPATH
 
 install:
   - pip install -r requirements.txt # install package
