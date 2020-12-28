@@ -24,15 +24,16 @@
     along with AtmosRT.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 import setuptools
 from numpy.distutils.core import setup, Extension
 
 
 libsbdart = Extension(name='libsbdart',
-                sources=[
-                    "src/sbdart/main.pyf",
-                    "src/sbdart/all.f",
-                ])
+                      sources=[
+                            "src/sbdart/main.pyf",
+                            "src/sbdart/all.f",
+                    ])
 
 
 libsmarts = Extension(name='libsmarts_295',
@@ -44,7 +45,7 @@ libsmarts = Extension(name='libsmarts_295',
 
 setup(
     name='AtmosRT',
-    version='0.5',
+    version='0.5.2',
     author='Ghislain Picard',
     author_email='ghipicard@gmail.com',
     license='GPLv3',
@@ -61,5 +62,5 @@ setup(
     scripts=['src/sbdart/sbdart.py', 'src/smarts/smarts.py'],
     packages=['atmosrt'],
     include_package_data=True,
-    install_requires=['numpy', 'pandas'],
+    install_requires=['numpy', 'pandas', 'msgpack-python', 'trimesh', 'snowoptics'],
 )
