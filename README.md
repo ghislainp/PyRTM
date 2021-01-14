@@ -11,7 +11,7 @@ Prerequisites
  * Python 3.6.
  * If needed, SMARTS 2.9.5 must be compiled and installed on your system
    `$PATH` as `smarts295`.
- * SBDart is compiled during the setup using numpy.distutils, which requires a working fortran compiler.  
+ * SBDart is compiled during the setup using numpy.distutils, which requires a working fortran compiler. E.g. if using Anaconda: `conda install -c conda-forge fortran-compiler`
  * Numpy and Pandas are required.
 
 
