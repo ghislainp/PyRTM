@@ -186,7 +186,7 @@ def translate(config):
                   'IDAY': tt.tm_yday,
                   })(v.utctimetuple())
                  ),
-        'elevation': ((), lambda v: {'ZOUT': [v, 50]}),
+        'elevation': ((), lambda v: {'ZOUT': [v / 1000, 50]}),  # convert to km
         'surface_type': ((), lambda v: {
             'ISALB': {
                 'snow': 1,
