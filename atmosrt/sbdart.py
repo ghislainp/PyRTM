@@ -83,7 +83,11 @@ class SBdart(_rtm.Model):
             except IOError as err:
                 raise SBdartError("didn't get output %s -- %s" % (output, err))
 
-            model_spectrum = pandas.read_csv(sbout, skiprows=3, delimiter=' +',
+            firstline = sbout.readline()
+            if firstline.startswith("CHKIN"):
+                raise SBdartError("Error detected in the input\n%s" % sbout.read())
+
+            model_spectrum = pandas.read_csv(sbout, skiprows=2, delimiter=' +',
                                              names=['wavelength', 'filter_function_value', 'top_downward_flux',
                                                     'top_upward_flux', 'top_direct_downward_flux',
                                                     'global', 'upward', 'direct'],
